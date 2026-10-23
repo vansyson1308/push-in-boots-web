@@ -55,14 +55,14 @@
       var mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent) ||
         (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 
-      // The game is landscape 16:9 to 21:9: a desktop window outside that range gets bars; a phone fills the screen
-      // (held upright, the game shows its own "turn your phone" card).
+      // The game is landscape 16:9 to 19.5:9: a wider or squarer window or tablet gets bars; a phone held upright
+      // fills the screen (the game shows its own "turn your phone" card there).
       function fit() {
         var w = window.innerWidth, h = window.innerHeight;
-        if (!mobile) {
+        if (w > h) {
           var aspect = w / h;
           if (aspect < 16 / 9) h = Math.floor(w * 9 / 16);
-          else if (aspect > 21 / 9) w = Math.floor(h * 21 / 9);
+          else if (aspect > 19.5 / 9) w = Math.floor(h * 19.5 / 9);
         }
         canvas.style.width = w + "px";
         canvas.style.height = h + "px";
