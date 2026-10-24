@@ -52,14 +52,16 @@
       })();
 
       var canvas = document.querySelector("#unity-canvas");
-      var mobile = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent) ||
+      // Same test as BootsWebIsMobile in BootsBridge.jslib: the game's "turn your phone" card keys off it.
+      var mobile = /Android|iPhone|iPad|iPod|Mobile|Silk|Kindle/i.test(navigator.userAgent) ||
         (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 
-      // The game is landscape 16:9 to 19.5:9: a wider or squarer window or tablet gets bars; a phone held upright
-      // fills the screen (the game shows its own "turn your phone" card there).
+      // The game is landscape 16:9 to 19.5:9: every frame gets bars to that range, a desktop window or an embedding
+      // iframe taller than wide too (0.3.1 F1: GiG embeds the game in a frame of its own size). Only a phone or tablet
+      // held upright fills the screen, where the game shows its own "turn your phone" card.
       function fit() {
         var w = window.innerWidth, h = window.innerHeight;
-        if (w > h) {
+        if (w > h || !mobile) {
           var aspect = w / h;
           if (aspect < 16 / 9) h = Math.floor(w * 9 / 16);
           else if (aspect > 19.5 / 9) w = Math.floor(h * 19.5 / 9);
@@ -83,9 +85,11 @@
         frameworkUrl: buildUrl + "/Web.framework.js.unityweb",
         codeUrl: buildUrl + "/Web.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
+        // Files under Application.persistentDataPath (save, crash log) reach IndexedDB without a manual FS.syncfs.
+        autoSyncPersistentDataPath: true,
         companyName: "Obsidian Lantern",
         productName: "Push In Boots",
-        productVersion: "0.3.0",
+        productVersion: "0.3.1",
         showBanner: function (msg, type) { if (type === "error") showError(msg); else console.warn(msg); },
       };
       // Phones: render at most 2x the CSS size (3x screens cost a lot of fill rate for no visible gain).
