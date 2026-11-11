@@ -42,6 +42,11 @@ export class Bot {
         if (boss.attack === 'charge') mx = -1;
         void wx;
       } else if (Math.abs(c.x - cx) > 2.5) mx = Math.sign(cx - c.x);
+      // pinned against the edge of the arena with a goblin on top of us: slip out the other way
+      if (sim.cam.lockX != null && mx) {
+        const lo = sim.cam.lockX - sim.viewW / 2 + 1.2, hi = sim.cam.lockX + sim.viewW / 2 - 1.2;
+        if ((mx > 0 && c.x > hi) || (mx < 0 && c.x < lo)) mx = -mx;
+      }
       // a goblin waiting underneath: drop down to it
       if (near && c.onPlat && near.y < c.y - 1.2 && nd < 8) { my = -1; mx = 0; tap(); }
       // never back off a ledge

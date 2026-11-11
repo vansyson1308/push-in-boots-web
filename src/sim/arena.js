@@ -17,7 +17,11 @@ export function makeArena(seed, mode) {
     platforms.push({ x0: cx - w / 2, x1: cx + w / 2, y: i % 2 ? 3.5 : 1.9, kind: 'static' });
   }
   const ground = [[L, R, 0]];
-  if (r.chance(0.6)) { const m = r.range(11, 17); ground.length = 0; ground.push([L, m - 1, 0], [m + 1, R, 0]); platforms.push({ x0: m - 1.2, x1: m + 1.2, y: 1.7, kind: 'static' }); }
+  let startX = (L + R) / 2;
+  if (r.chance(0.6)) {
+    const m = r.range(11, 17); ground.length = 0; ground.push([L, m - 1, 0], [m + 1, R, 0]); platforms.push({ x0: m - 1.2, x1: m + 1.2, y: 1.7, kind: 'static' });
+    startX = m > (L + R) / 2 ? m - 4.5 : m + 4.5;          // well clear of the gap
+  }
   const art = { 1: ['tree', 'fence', 'grass', 'straw'], 2: ['reeds', 'rope_post', 'stone_arch', 'grass'], 3: ['pine', 'pebbles', 'dry_grass', 'rock_ledge'] }[world];
   const decor = [];
   for (let i = 0; i < 8; i++) {
@@ -27,7 +31,7 @@ export function makeArena(seed, mode) {
   }
   return {
     id: mode, world, index: 0, kind: 'run', art: ['', 'green_fields', 'stone_bridge', 'goblin_pass'][world], seed,
-    start_x: (L + R) / 2 + (ground.length > 1 ? 3 : 0), start_y: 0, goal_x: 1e9, goal_y: 0, par_seconds: DAILY_SECONDS, double_jump: true,
+    start_x: startX, start_y: 0, goal_x: 1e9, goal_y: 0, par_seconds: DAILY_SECONDS, double_jump: true,
     ground, blocks: [], platforms, checkpoints: [], enemies: [], hazards: [], pickups: [], decor, locks: [],
     arena: { mode, L, R }, bounds: [L - 3.5, R + 3.5],
   };

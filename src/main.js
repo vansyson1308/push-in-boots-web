@@ -1,7 +1,7 @@
 // Boot, the frame loop and the flow between screens.
 import { A, loadCore, loadWorld } from './assets.js';
 import { audioInit, audioResume, audioSuspend, setSound, setMusic, music, play as sfx } from './audio.js';
-import { Input } from './input.js';
+import { Input, setHaptics } from './input.js';
 import { View } from './render/view.js';
 import { Play } from './play.js';
 import { prepareStages, rankFor } from './stages.js';
@@ -23,7 +23,7 @@ const app = {
 
   applyPrefs() {
     const p = save.data.prefs;
-    setSound(p.sound); setMusic(p.music);
+    setSound(p.sound); setMusic(p.music); setHaptics(p.haptics);
     if (this.play) { this.play.fx.reduced = !p.effects; }
   },
   setLanguage(l) { save.data.lang = l; setLang(l); persist(); },
@@ -39,7 +39,7 @@ const app = {
       return;
     }
     ui.clearUi(); this.screen = 'loading';
-    await loadWorld(st.world);
+    if (!(await this.loadArt(st.world))) return;
     const rec = stageRec(id);
     this.begin({
       stage: st, mode: 'story', seed: st.seed, opts: { ...this.upgrades(), opened: rec.cages || [] },
@@ -55,14 +55,18 @@ const app = {
     else { key = challenge && challenge.mode === 'e' ? challenge.key : seedKey || String(1 + Math.floor(Math.random() * 2e9)); seed = parseInt(key, 10) || 1; }
     const st = makeArena(seed, mode);
     ui.clearUi(); this.screen = 'loading';
-    await loadWorld(st.world);
-    this.arena = { mode, key: String(key), challenge: challenge || null };
+    if (!(await this.loadArt(st.world))) return;
+    this.arena = { mode, key: String(key), challenge: challenge || null, day: today() };
     this.begin({ stage: st, mode, seed, opts: { pressure: 0, tank: 0, hearts: 3, magnet: 0 }, onEnd: (res) => this.endArena(res),
       rival: challenge ? { name: nameOf(challenge.name), score: challenge.score } : null });
   },
 
+  async loadArt(world) {
+    try { await loadWorld(world); return true; } catch (e) { this.toMap(); ui.toast(t('load_fail'), 4000); return false; }
+  },
   begin(cfg) {
     const d = save.data;
+    this.input.releaseAll();
     this.lastCfg = cfg;
     this.view.resize();
     this.play = new Play(this.view, this.input, {
@@ -140,10 +144,11 @@ const app = {
     const coins = Math.floor(res.score / 250);
     let newBest = false, counted = false;
     if (daily) {
-      const day = today(), isToday = a.key === day.replace(/-/g, '');
+      const day = a.day || today(), isToday = a.key === day.replace(/-/g, '');
       if (isToday && d.daily.date !== day) {
         counted = true;
-        const y = new Date(Date.now() - 864e5), yk = y.getFullYear() + '-' + String(y.getMonth() + 1).padStart(2, '0') + '-' + String(y.getDate()).padStart(2, '0');
+        const p = day.split('-').map(Number), y = new Date(p[0], p[1] - 1, p[2] - 1);
+        const yk = y.getFullYear() + '-' + String(y.getMonth() + 1).padStart(2, '0') + '-' + String(y.getDate()).padStart(2, '0');
         d.daily = { date: day, score: res.score, chain: res.chain, pushed: res.pushed, streak: d.daily.date === yk ? d.daily.streak + 1 : 1, best: Math.max(d.daily.best || 0, res.score) };
         newBest = res.score >= d.daily.best;
       }
@@ -163,12 +168,17 @@ function persistSeen() { save.data.seen = Array.from(app.seen || []); persist();
 let last = 0;
 function frame(ts) {
   const dt = Math.min(0.1, (ts - last) / 1000 || 0); last = ts;
-  if (app.play && (app.screen === 'play' || app.screen === 'results')) {
-    if (app.screen === 'play') {
-      if (app.bot && !app.play.paused) app.input.botFrame = app.bot.decide(app.play.sim);
-      app.play.update(dt);
-    } else { app.play.fx.step(dt); }
-    if (app.play) app.play.draw();
+  try {
+    if (app.play && (app.screen === 'play' || app.screen === 'results')) {
+      if (app.screen === 'play') {
+        if (app.bot && !app.play.paused) app.input.botFrame = app.bot.decide(app.play.sim);
+        app.play.update(dt);
+      } else { app.play.fx.step(dt); }
+      if (app.play) app.play.draw();
+    }
+  } catch (e) {                      // one bad frame must never freeze the game
+    console.error(e); app.errors = (app.errors || 0) + 1;
+    try { app.view.ctx.restore(); } catch (e2) { /* nothing to restore */ }
   }
   requestAnimationFrame(frame);
 }
@@ -224,8 +234,8 @@ addEventListener('keydown', (e) => {
   if (app.screen === 'play' && app.play && !app.play.paused) return;
   const root = document.querySelector('#ui .modal:last-child') || document.querySelector('#ui .screen');
   if (!root) return;
-  if (e.code === 'Enter' || e.code === 'NumpadEnter') { const b = root.querySelector('.btn.green:not([disabled])'); if (b) { e.preventDefault(); b.click(); } }
-  else if (e.code === 'Escape') { const b = root.querySelector('[data-act=resume],[data-act=close],[data-act=skip]'); if (b) { e.preventDefault(); b.click(); } }
+  if (e.code === 'Enter' || e.code === 'NumpadEnter') { const b = root.querySelector('.btn.green:not([disabled])'); if (b) { e.preventDefault(); e.stopImmediatePropagation(); b.click(); } }
+  else if (e.code === 'Escape') { const b = root.querySelector('[data-act=resume],[data-act=close],[data-act=skip]'); if (b) { e.preventDefault(); e.stopImmediatePropagation(); b.click(); } }
 });
 document.addEventListener('visibilitychange', () => { if (document.hidden) { app.pause(); audioSuspend(); } else audioResume(); });
 addEventListener('blur', () => app.pause());
@@ -234,7 +244,7 @@ addEventListener('keydown', (e) => { if (['Space', 'ArrowUp', 'ArrowDown'].inclu
 document.addEventListener('gesturestart', (e) => e.preventDefault());
 
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !params.get('nosw')) {
-  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 void totalKittens;
 bootGame();

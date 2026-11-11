@@ -24,13 +24,15 @@ export function hitBoss(s, b, shot, imp) {
   const d = b.def;
   if (imp.direct) { damage(s, b, imp.dmg); return true; }
   const wx = b.x + d.weak[0], wy = b.y + d.weak[1];
-  const r = shot.r || 0.2;
-  if (Math.hypot(shot.x - wx, shot.y - wy) < d.weakR + r) {
+  const r = shot.r || 0.2, big = shot.r > 0.5;
+  const inHull = Math.abs(shot.x - b.x) < d.w / 2 + (big ? shot.r : 0) && shot.y > b.y - (big ? shot.r : 0) && shot.y < b.y + d.h + (big ? shot.r : 0);
+  // The gem sits in the hull, so what counts is the height at which water strikes the machine.
+  if (!big && inHull && Math.abs(shot.y - wy) < d.weakR + r + 0.12) {
     damage(s, b, imp.dmg);
     s.ev('weakHit', { x: wx, y: wy });
     return true;
   }
-  if (Math.abs(shot.x - b.x) < d.w / 2 + (shot.r > 0.5 ? shot.r : 0) && shot.y > b.y && shot.y < b.y + d.h) {
+  if (inHull) {
     if (shot.r > 0.5) damage(s, b, imp.dmg * 0.6);
     else { damage(s, b, imp.dmg * 0.08, true); s.ev('tink', { x: shot.x, y: shot.y, boss: true }); }
     return true;
@@ -50,7 +52,8 @@ function damage(s, b, dmg, quiet) {
   if (b.hp <= 0) {
     b.hp = 0; b.state = 'down'; b.t = 0; b.pilot = 'dizzy'; b.vx = 1;
     s.slowT = 1.1; s.addScore(5000, b.x, b.y + 4, 'boss');
-    s.bullets.length = 0; s.hazards.length = 0;
+    s.wipe = true;                                   // clear shots and hazards at the start of the next step, not mid-loop
+    for (const b of s.bullets) b.dead = true;
     for (const e of s.enemies) if (e.state !== 'gone') { e.state = 'gone'; s.ev('poof', { x: e.x, y: e.y + 0.4, type: e.type, flee: true, dir: 1 }); }
     s.ev('bossDown', { x: b.x, y: b.y + 2 });
   }

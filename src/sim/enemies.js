@@ -107,7 +107,7 @@ function throwAt(s, e, kind, T, o = {}) {
 
 function floorAhead(s, e, dir) {
   // a short drop is fine (goblins hop down ledges); a pit is not
-  return floorBelow(s.world, e.x + dir * (e.hw + 0.35), e.y + 0.3) > e.y - 2.4;
+  return floorBelow(s.world, e.x + dir * (e.hw + 0.35), e.y + 2.2) > e.y - 2.4;
 }
 
 function cheer(s) {
@@ -146,7 +146,7 @@ export function stepEnemies(s, dt) {
         const D = ENEMIES[e.type], reach = e.type === 'armored' ? 1.25 : 1.0;
         if (e.state === 'walk') {
           if (e.type === 'shield') {                   // slow to turn: get behind it
-            if (Math.sign(dx) !== e.face && adx > 0.3) { e.turnT += dt; if (e.turnT > 0.6) { e.face = Math.sign(dx); e.turnT = 0; } } else e.turnT = 0;
+            if (Math.sign(dx) !== e.face && adx > 0.05) { e.turnT += dt; if (e.turnT > 0.6) { e.face = Math.sign(dx); e.turnT = 0; } } else e.turnT = 0;
           } else faceCat();
           if (ok && adx < reach && Math.abs(dy) < 1.2 && e.cd <= 0 && Math.sign(dx) === e.face) { e.state = 'tell'; e.t = 0; s.ev('tell', { x: e.x, y: e.y + e.h, kind: 'bash' }); }
           else if (ok && adx > 0.75 && (vis || e.lock)) want = e.face * D.speed * (s.speedScale || 1);
@@ -241,6 +241,9 @@ export function stepEnemies(s, dt) {
     else if (e.stagger > 0) { if (e.grounded) e.vx -= e.vx * Math.min(1, PUSH.groundDrag * dt); }
     else if (e.grounded) {
       if (want && !floorAhead(s, e, Math.sign(want))) want = 0;       // goblins do not walk off cliffs. They get pushed.
+      // ...unless an ambusher has been stranded across a gap for a while: then it takes a running jump
+      e.stuckT = e.lock && e.want && !want && e.state === 'walk' && adx > 2.5 ? (e.stuckT || 0) + dt : 0;
+      if (e.stuckT > 2.2) { e.stuckT = 0; e.state = 'leap'; e.t = 0; e.vx = Math.sign(dx) * Math.min(9, 3 + adx * 0.75); e.vy = 10.5; e.grounded = false; e.onPlat = null; }
       e.vx += (want - e.vx) * Math.min(1, dt * 14);
     } else if (want && e.vy > 0) e.vx += (want - e.vx) * Math.min(1, dt * 6);   // carrying on over the ledge they hopped
     e.vy -= 34 * dt;

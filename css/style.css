@@ -12,15 +12,15 @@
 html, body { margin: 0; height: 100%; overflow: hidden; background: #231712; overscroll-behavior: none; }
 body { font-family: "Baloo 2", "Fredoka", "Nunito", system-ui, sans-serif; font-weight: 800; color: var(--ink); font-size: var(--u);
   -webkit-user-select: none; user-select: none; touch-action: none; line-height: 1.15; }
-#game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; outline: none; touch-action: none; }
+#game { position: fixed; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; display: block; outline: none; touch-action: none; }
 button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; padding: 0; touch-action: manipulation; }
 img { -webkit-user-drag: none; user-drag: none; }
 [hidden] { display: none !important; }
 
 /* boot */
-#boot { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.2vh;
+#boot { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.2vh;
   background: #2b1d16 url("../assets/ui/keyart.jpg") center / cover no-repeat; transition: opacity .35s; }
-#boot::before { content: ""; position: absolute; inset: 0; background: rgba(43, 29, 22, .38); }
+#boot::before { content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(43, 29, 22, .38); }
 #boot > * { position: relative; }
 #boot-logo { width: min(58vw, 520px); height: auto; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .45)); }
 #boot-tag { color: #fff3d6; font-size: clamp(1.1em, 3.2vmin, 1.7em); text-shadow: 0 2px 0 #3a2414, 0 0 10px rgba(0, 0, 0, .5); text-align: center; padding: 0 1em; min-height: 1.2em; }
@@ -34,11 +34,11 @@ img { -webkit-user-drag: none; user-drag: none; }
 @keyframes bob { 50% { transform: translateY(-1.2vh) rotate(-1deg); } }
 
 /* shell */
-#ui { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
+#ui { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 10; pointer-events: none; }
 #ui > * { pointer-events: auto; }
-.screen { position: absolute; inset: 0; display: flex; flex-direction: column; overflow: hidden;
+.screen { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex; flex-direction: column; overflow: hidden;
   background: #2b1d16 url("../assets/ui/keyart.jpg") center 30% / cover no-repeat; animation: fadein .25s; }
-.screen::before { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(60, 130, 210, .30), rgba(43, 29, 22, .72)); }
+.screen::before { content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(rgba(60, 130, 210, .30), rgba(43, 29, 22, .72)); }
 .screen > * { position: relative; }
 @keyframes fadein { from { opacity: 0; } }
 @keyframes popin { from { transform: scale(.85); opacity: 0; } }
@@ -66,7 +66,7 @@ img { -webkit-user-drag: none; user-drag: none; }
 #pause-btn { position: fixed; z-index: 12; top: calc(.7em + var(--sat)); right: calc(.8em + var(--sar)); opacity: .92; font-size: 1.05em; }
 
 .panel { background: var(--cream); border: 4px solid var(--ink); border-radius: 1.5em; box-shadow: 0 .45em 0 rgba(43, 29, 22, .55); padding: 1.1em 1.3em; }
-.modal { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(30, 18, 10, .62); padding: calc(.8em + var(--sat)) .8em calc(.8em + var(--sab)); animation: fadein .18s; z-index: 5; }
+.modal { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: center; background: rgba(30, 18, 10, .62); padding: calc(.8em + var(--sat)) .8em calc(.8em + var(--sab)); animation: fadein .18s; z-index: 5; }
 .modal > .panel { max-width: min(94vw, 34em); width: 100%; max-height: 100%; overflow-y: auto; touch-action: pan-y; animation: popin .22s cubic-bezier(.2, 1.4, .4, 1); }
 .modal.wide > .panel { max-width: min(96vw, 46em); }
 .panel h2 { margin: 0 0 .5em; font-size: 1.8em; text-align: center; color: var(--brown); }
@@ -95,7 +95,7 @@ img { -webkit-user-drag: none; user-drag: none; }
 .nodes { display: flex; justify-content: space-around; align-items: flex-start; padding: .8em .4em 1em; gap: .2em; background: repeating-linear-gradient(90deg, transparent 0 1.1em, rgba(107, 61, 28, .16) 1.1em 1.6em) center 2.6em / 100% .32em no-repeat; }
 .node { position: relative; display: flex; flex-direction: column; align-items: center; width: 19%; font-size: 1em; transition: transform .1s; }
 .node:active { transform: scale(.94); }
-.node .disc { width: clamp(3.6em, 13vmin, 5.2em); aspect-ratio: 1; background: center / contain no-repeat; display: flex; align-items: center; justify-content: center; font-size: 1em; }
+.node .disc { width: clamp(3.6em, 13vmin, 5.2em); height: clamp(3.6em, 13vmin, 5.2em); background: center / contain no-repeat; display: flex; align-items: center; justify-content: center; font-size: 1em; }
 .node .disc b { font-size: 1.55em; color: var(--ink); margin-top: -.1em; }
 .node .disc img { height: 2.1em; width: auto; }
 .node.cur .disc { animation: pulse 1.3s ease-in-out infinite; }
@@ -159,3 +159,6 @@ img { -webkit-user-drag: none; user-drag: none; }
 #toast { position: fixed; left: 50%; bottom: calc(6vh + var(--sab)); transform: translateX(-50%); z-index: 60; background: rgba(43, 29, 22, .92); color: var(--cream); padding: .5em 1.2em; border-radius: 1.5em; font-size: 1.2em; max-width: 90vw; text-align: center; animation: popin .2s; pointer-events: none; }
 @media (max-height: 430px) { :root { --u: clamp(10px, 2.9vh, 15px); } .world .banner { height: 4.4em; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01s !important; animation-iteration-count: 1 !important; } }
+/* the buttons of a tall panel stay in reach on short screens */
+.modal > .panel > .row:last-child, .modal > .panel > .col:last-child { position: sticky; bottom: -1.1em; background: linear-gradient(rgba(255, 243, 214, 0), var(--cream) 28%); padding: .9em 0 .5em; margin-bottom: -.6em; z-index: 2; }
+#boot-tag:not(:empty) { background: rgba(43, 29, 22, .6); border-radius: 2em; padding: .15em 1.1em; }

@@ -31,6 +31,7 @@ export class Input {
     const up = (e) => this.up(e);
     canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up); canvas.addEventListener('lostpointercapture', up);
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') this.mouse = false; });   // released over a menu, not the canvas
   }
   releaseAll() {
     this.ptr.clear(); const t = this.touch; t.stick = null; t.dx = t.dy = 0; t.jump = t.fire = t.special = false;
@@ -104,4 +105,6 @@ export class Input {
     return f;
   }
 }
-export function vibrate(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* unsupported */ } }
+let haptics = true;
+export function setHaptics(on) { haptics = !!on; }
+export function vibrate(ms) { try { if (haptics && navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* unsupported */ } }

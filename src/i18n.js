@@ -60,7 +60,7 @@ const EN = {
   story_2: 'One cat had a hat, a pair of boots, and a very big water blaster.',
   story_end_1: 'The Goblin King got the soaking of his life.',
   story_end_2: 'And once they had dried off, the goblins came back — to help. Thank you for playing!', skip: 'Skip', cont: 'Continue',
-  rotate: 'Tip: turn your phone sideways for a bigger view', install: 'Works offline once loaded',
+  rotate: 'Tip: turn your phone sideways for a bigger view', load_fail: 'Could not load the stage. Check your connection and try again.', install: 'Works offline once loaded',
   unlocked_world: 'New road open: {0}!', all_clear: 'Farm saved!',
   credits: 'Push In Boots · Obsidian Lantern',
 };
@@ -122,7 +122,7 @@ const VI = {
   story_2: 'Có một chú mèo với chiếc mũ, đôi ủng, và một khẩu súng nước rất to.',
   story_end_1: 'Vua Yêu Tinh được một trận ướt nhớ đời.',
   story_end_2: 'Và khi đã khô ráo, lũ yêu tinh quay lại — để phụ việc đồng áng. Cảm ơn bạn đã chơi!', skip: 'Bỏ qua', cont: 'Tiếp',
-  rotate: 'Mẹo: xoay ngang điện thoại để nhìn rộng hơn', install: 'Tải xong là chơi được cả khi mất mạng',
+  rotate: 'Mẹo: xoay ngang điện thoại để nhìn rộng hơn', load_fail: 'Không tải được màn chơi. Hãy kiểm tra mạng rồi thử lại.', install: 'Tải xong là chơi được cả khi mất mạng',
   unlocked_world: 'Mở đường mới: {0}!', all_clear: 'Đã cứu nông trại!',
   credits: 'Push In Boots · Obsidian Lantern',
 };

@@ -175,3 +175,71 @@ test('Vietnamese has every string English has', () => {
   assert.deepEqual(en.filter((k) => !vi.has(k)), []);
   for (const k of en) assert.equal((TABLES.en[k].match(/\{\d\}/g) || []).length, (TABLES.vi[k].match(/\{\d\}/g) || []).length, `placeholders differ in ${k}`);
 });
+
+// ---- regressions found in review -------------------------------------------------------------
+import fs from 'node:fs';
+import { hitBoss } from '../src/sim/boss.js';
+import { groundY } from '../src/sim/world.js';
+
+test('a bomb that finishes a boss while other shots are in the air does not break the step', () => {
+  for (const id of ['1-5', '2-5', '3-5']) {
+    const sim = new Sim(data.stages[id], {});
+    sim.locks.forEach((l) => { l.done = true; });
+    const b = sim.boss; b.state = 'fight'; b.hp = 1; sim.cam.lockX = b.x - 6; sim.cat.x = b.x - 8; sim.snapCamera();
+    sim.addBullet({ kind: 'pebble', x: b.x - 5, y: 3, vx: 0, vy: 0, grav: 0, r: 0.2 });
+    sim.addBullet({ kind: 'bomb', x: b.x - b.def.w / 2 - 0.3, y: b.y + 0.4, vx: 0, vy: 0, grav: 0, r: 0.26, fuse: 0.02, shootable: true });
+    sim.addBullet({ kind: 'ball', x: b.x - 6, y: 1, vx: -1, vy: 0, grav: 0, r: 0.2 });
+    for (let i = 0; i < 400 && !sim.outcome; i++) sim.step(idle);
+    assert.equal(sim.outcome, 'win', id);
+  }
+});
+
+test('every boss gem can be hit by water that strikes the hull at gem height', () => {
+  for (const id of ['1-5', '2-5', '3-5']) {
+    const sim = new Sim(data.stages[id], {});
+    const b = sim.boss; b.state = 'fight';
+    const face = b.x - b.def.w / 2 + 0.1, wy = b.y + b.def.weak[1];
+    const hp = b.hp;
+    assert.equal(hitBoss(sim, b, { x: face, y: wy + 0.3, r: 0.2 }, { dmg: 1, px: 5, py: 0, kind: 'pea' }), true);
+    assert.equal(b.hp, hp - 1, `${id}: a shot at gem height should do full damage`);
+    hitBoss(sim, b, { x: face, y: b.y + 0.3, r: 0.2 }, { dmg: 1, px: 5, py: 0, kind: 'pea' });
+    assert.ok(b.hp > hp - 1.2, `${id}: the hull only chips`);
+    // and a cat that jumps and sprays really does land gem hits
+    const s2 = new Sim(data.stages[id], {}); const b2 = s2.boss; b2.state = 'fight';
+    s2.locks.forEach((l) => { l.done = true; });
+    s2.cat.x = b2.x - b2.def.w / 2 - 2.2; s2.cat.y = b2.y; s2.cam.lockX = b2.x - 6; s2.snapCamera();
+    let weak = 0;
+    for (let i = 0; i < 900; i++) {
+      b2.attack = null; b2.cd = 5; s2.cat.inv = 1; s2.bullets.length = 0;
+      s2.step({ mx: 0.3, my: b2.def.weak[1] > 3 ? 1 : 0, jump: i % 50 < 22, fire: true });
+      for (const e of s2.events) if (e.t === 'weakHit') weak++;
+      s2.events.length = 0;
+    }
+    assert.ok(weak >= 8, `${id}: only ${weak} gem hits in 15 s of jumping and spraying`);
+  }
+});
+
+test('the arena never starts the cat over a gap', () => {
+  for (let seed = 1; seed <= 1500; seed++) {
+    const st = makeArena(seed * 7919 + 3, seed % 2 ? 'daily' : 'endless');
+    const w = { solids: st.ground.map((g) => ({ x0: g[0], x1: g[1], y0: -60, y1: g[2], kind: 'ground' })), plats: [] };
+    for (const dx of [-1.2, 0, 1.2]) assert.ok(groundY(w, st.start_x + dx) > -1, `seed ${seed}: no ground at ${st.start_x + dx}`);
+  }
+});
+
+test('goblins hop up a ledge to reach the cat instead of standing below it', () => {
+  const st = yard(); st.ground = [[0, 20, 0], [20, 40, 1.3]];
+  const sim = new Sim(st, {});
+  sim.cat.x = 25; sim.cat.y = 1.3; sim.snapCamera();
+  const g = spawnEnemy(sim, 'runner', 19.3, 0, {});
+  for (let i = 0; i < 300; i++) { sim.cat.inv = 1; sim.step(idle); }
+  assert.ok(g.y > 1.2 && g.x > 20, `goblin stuck at x=${g.x.toFixed(1)} y=${g.y.toFixed(1)}`);
+});
+
+test('the offline shell lists every script and the core art', () => {
+  const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
+  const walk = (dir) => fs.readdirSync(new URL('../' + dir, import.meta.url), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(dir + '/' + e.name) : [dir + '/' + e.name]));
+  for (const f of walk('src').filter((f) => f.endsWith('.js'))) assert.ok(sw.includes(`"${f}"`), `${f} is missing from the service worker shell`);
+  for (const f of walk('assets/ui').filter((f) => f.endsWith('.webp'))) assert.ok(sw.includes(`"${f}"`), `${f} is missing from the service worker shell (run node tools/make_sw.mjs)`);
+  for (const f of sw.match(/"(assets|src|css)\/[^"]+"/g).map((s) => s.slice(1, -1))) assert.ok(fs.existsSync(new URL('../' + f, import.meta.url)), `${f} is listed but does not exist`);
+});

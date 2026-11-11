@@ -96,6 +96,7 @@ export class Sim {
   step(input) {
     const dt = DT;
     if (this.freeze > 0) { this.freeze -= dt; return; }
+    if (this.wipe) { this.wipe = false; this.bullets.length = 0; this.hazards.length = 0; }
     this.time += dt;
     if (this.outcome) this.outcomeT += dt;
     stepPlatforms(this.world, this.time, dt);
@@ -210,7 +211,7 @@ export class Sim {
 
     // safe spot, pits
     if (c.grounded && (!c.onPlat || c.onPlat.kind === 'static') && !this.nearEdge(c)) { this.safe.x = c.x; this.safe.y = c.y; }
-    const floor = this.climb ? this.cam.y - VIEW_H / 2 - 2.5 : this.killY;
+    const floor = this.climb ? this.cam.y - VIEW_H / 2 - 1.2 : this.killY;
     if (c.y < floor) this.fellInPit();
 
     // checkpoints and goal
@@ -526,6 +527,7 @@ export class Sim {
     const c = this.cat, w = this.world;
     for (let i = this.bullets.length - 1; i >= 0; i--) {
       const b = this.bullets[i];
+      if (!b) continue;
       b.age += dt; b.vy -= (b.grav || 0) * dt; b.x += b.vx * dt; b.y += b.vy * dt;
       if (b.kind === 'bomb') {
         b.fuse -= dt;
@@ -710,7 +712,7 @@ export class Sim {
     if (this.maxX - this.minX <= this.viewW) tx = (this.minX + this.maxX) / 2;
     else tx = Math.max(this.minX + half, Math.min(this.maxX - half, tx));
     let ty;
-    if (this.climb) ty = Math.max(VIEW_H / 2 - 1.6, c.y + 1.6);
+    if (this.climb) ty = Math.max(VIEW_H / 2 - 1.6, Math.max(c.y, this.safe.y - 1.5) + 1.6);
     else ty = VIEW_H / 2 - 1.6 + Math.max(0, Math.min(8, (c.grounded ? c.y : Math.min(c.y, this.safe.y + 3)) - 2.2)) * 0.75;
     return [tx, ty];
   }

@@ -87,16 +87,28 @@ Two more tools are useful while tuning:
 node tools/botrun.mjs            # play every stage with the bot and print the outcome
 node tools/calibrate.mjs         # reset the third-star score targets from bot playthroughs
 node tools/smoke.mjs             # browser walk-through (needs Playwright)
+node tools/make_sw.mjs           # refresh the offline file list in sw.js after adding files
 ```
+
+When you publish a new version, bump `VERSION` at the top of `sw.js` so returning players get a
+clean cache.
 
 Handy URL switches for testing: `?play=2-3` starts a stage directly, `?arena=daily` or
 `?arena=endless` starts an arena run, `?bot=1` lets the bot play, `?lang=vi` forces a language.
 
 ## Assets
 
-Art, audio and stage layouts come from the original Push In Boots project.
-`tools/build_assets.py` packs them into the atlases under `assets/` (it needs the extracted
-source art, Pillow and ffmpeg). The typeface is Baloo 2 (SIL Open Font License, see
+Art, audio and stage layouts come from the original Push In Boots project. To rebuild
+`assets/` from the Unity build (needs UnityPy, brotli, Pillow and ffmpeg):
+
+```bash
+python3 tools/extract_unity.py legacy-unity/Build /tmp/pib-extract
+```
+
+```bash
+python3 tools/build_assets.py /tmp/pib-extract
+```
+ The typeface is Baloo 2 (SIL Open Font License, see
 `assets/font/OFL.txt`).
 
 ## Design

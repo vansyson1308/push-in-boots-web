@@ -131,7 +131,7 @@ UI = ['icon_bomb', 'icon_booster', 'icon_calendar', 'icon_check', 'icon_chest', 
       'icon_gift', 'icon_goblin', 'icon_hammer', 'icon_haptics', 'icon_hint', 'icon_missions', 'icon_music', 'icon_pause',
       'icon_rainbow', 'icon_ribbon', 'icon_shop', 'icon_skull', 'icon_sound', 'icon_undo', 'icon_wish', 'icon_token',
       'lock', 'star', 'star_empty', 'coin', 'heart', 'ribbon_banner', 'hand_pointer', 'kitten_house', 'yarn_basket',
-      'node_current', 'node_done', 'node_locked', 'node_boss_1709', 'node_hard_1786', 'check', *KITTENS,
+      'node_current', 'node_done', 'node_locked', 'check', *KITTENS,
       'pose_sit', 'pose_meow', 'pose_salute', 'pose_sleep_curl', 'pose_play_yarn', 'hero_photo_pose', 'hero_pet_kitten',
       'hero_sit_fence', 'cage']
 for n in UI:

@@ -33,7 +33,7 @@ export function loadWorld(n) {
     worldLoads[n] = Promise.all([
       ...[`w${n}_0`, `boss${n}_0`].map(async (p) => { A.pages[p] = await loadImage(`assets/atlas/${p}.webp`); }),
       ...['sky', 'hills', 'ground'].map(async (k) => { A.images[`w${n}_${k}`] = await loadImage(`assets/bg/w${n}_${k}.webp`); }),
-    ]);
+    ]).catch((e) => { delete worldLoads[n]; throw e; });        // a network blip must not poison later attempts
   }
   return worldLoads[n];
 }

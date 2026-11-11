@@ -2,6 +2,15 @@
 import { A } from '../assets.js';
 import { VIEW_H, SPLASH, CAT, BLASTERS } from '../sim/tune.js';
 
+// Older browsers (Safari before 16, Firefox before 112) have no roundRect.
+if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+    r = Math.max(0, Math.min(typeof r === 'number' ? r : 0, Math.abs(w) / 2, Math.abs(h) / 2));
+    this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r);
+    this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); this.closePath();
+  };
+}
+
 export const FONT = '"Baloo 2", "Fredoka", "Nunito", system-ui, sans-serif';
 const HS = 1.36;   // hero art scale
 const GS = 1.16;   // goblin art scale
@@ -422,7 +431,7 @@ export class View {
     if (e.state === 'tell') return e.type === 'bomber' ? 'light_fuse' : e.type === 'shield' ? 'windup_bash' : e.type === 'sprinter' ? 'hop' : 'windup_throw';
     if (e.state === 'attack') return e.type === 'sprinter' ? 'trip' : e.type === 'bomber' || e.type === 'slinger' ? 'windup_throw' : 'trip';
     if (e.state === 'leap') return 'hop';
-    if (e.loot) return Math.abs(e.vx) > 0.5 ? (Math.floor(e.anim * 8) % 2 ? 'panic_run_a' : 'panic_run_b') : 'steal_none';
+    if (e.loot) return Math.abs(e.vx) > 0.5 ? (Math.floor(e.anim * 8) % 2 ? 'panic_run_a' : 'panic_run_b') : 'hop';
     if (e.skid > 0) return 'panic_run_b';
     if (Math.abs(e.vx) > 0.3) return Math.floor(e.anim * 5) % 2 ? 'hop' : 'flee';
     return 'hop';
