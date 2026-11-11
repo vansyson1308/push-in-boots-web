@@ -23,6 +23,7 @@ img { -webkit-user-drag: none; user-drag: none; }
 #boot::before { content: ""; position: absolute; inset: 0; background: rgba(43, 29, 22, .38); }
 #boot > * { position: relative; }
 #boot-logo { width: min(58vw, 520px); height: auto; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .45)); }
+#boot-tag { color: #fff3d6; font-size: clamp(1.1em, 3.2vmin, 1.7em); text-shadow: 0 2px 0 #3a2414, 0 0 10px rgba(0, 0, 0, .5); text-align: center; padding: 0 1em; min-height: 1.2em; }
 #boot-bar { width: min(56vw, 440px); height: 22px; border-radius: 12px; background: rgba(0, 0, 0, .45); border: 3px solid var(--cream); overflow: hidden; }
 #boot-fill { width: 0; height: 100%; background: linear-gradient(#ffe27a, #ffb52e); transition: width .15s; }
 #boot-note { color: var(--cream); font-size: 1.25em; text-shadow: 0 2px 4px rgba(0, 0, 0, .6); min-height: 1.3em; text-align: center; padding: 0 1em; }

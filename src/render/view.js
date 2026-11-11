@@ -50,7 +50,7 @@ export class View {
       // upright phone: the game sits in the upper part of the screen, thumbs get the rest
       this.vw = W; this.vh = Math.round(Math.min(H * 0.56, W / (11.6 / 9))); this.ox = 0;
       const zone = 250 * this.touchScale;
-      this.oy = Math.round(Math.max(56 * dpr, (H - this.vh - zone) * 0.42));
+      this.oy = Math.round(Math.max(56 * dpr, (H - this.vh - zone) * 0.3));
     }
     this.ppu = this.vh / VIEW_H;
     this.viewW = Math.max(11, this.vw / this.ppu);
@@ -243,9 +243,9 @@ export class View {
     const first = Math.floor((cx * par - W / 2 - 4) / 13);
     for (let j = first; j <= first + Math.ceil(W / 13) + 1; j++) {
       const id = 1 + ((j % 6) + 6) % 6, f = A.frames[`w${n}/fg_${id}`];
-      if (!f || id === 2 && n === 1) continue;
+      if (!f || (n === 1 && (id === 2 || id === 3))) continue;      // no fence or hay bale: they read as obstacles
       const wx = j * 13 + ((j * 5) % 7) - cx * par + cx;
-      this.spr(`w${n}/fg_${id}`, wx, base - 0.35 - ((j * 3) % 4) * 0.12, { sc: 1.15, ax: 0.5, ay: 0.72, alpha: 0.96 });
+      this.spr(`w${n}/fg_${id}`, wx, base - 0.12 - ((j * 3) % 4) * 0.1, { sc: 1.1, ax: 0.5, ay: 0.46, alpha: 0.96 });
     }
   }
 

@@ -11,7 +11,7 @@ import { save, loadSave, persist, resetSave, stageRec, today, daySeed, totalKitt
 import { t, setLang, detectLang, KITTEN_NAMES } from './i18n.js';
 import { KITTENS } from './sim/sim.js';
 import * as ui from './ui.js';
-import { decodeChallenge } from './share.js';
+import { decodeChallenge, nameOf } from './share.js';
 
 const params = new URLSearchParams(location.search);
 const canvas = document.getElementById('game');
@@ -52,7 +52,8 @@ const app = {
     ui.clearUi(); this.screen = 'loading';
     await loadWorld(st.world);
     this.arena = { mode, key: String(key), challenge: challenge || null };
-    this.begin({ stage: st, mode, seed, opts: { pressure: 0, tank: 0, hearts: 3, magnet: 0 }, onEnd: (res) => this.endArena(res) });
+    this.begin({ stage: st, mode, seed, opts: { pressure: 0, tank: 0, hearts: 3, magnet: 0 }, onEnd: (res) => this.endArena(res),
+      rival: challenge ? { name: nameOf(challenge.name), score: challenge.score } : null });
   },
 
   begin(cfg) {
@@ -188,6 +189,7 @@ async function bootGame() {
   const c = params.get('c');
   if (c) { app.challenge = decodeChallenge(c); history.replaceState(null, '', location.pathname); }
   boot.classList.add('tap'); note.textContent = t('title_tap');
+  document.getElementById('boot-tag').textContent = t('tagline');
   window.pibReady = true;
   const go = () => {
     removeEventListener('keydown', go); boot.removeEventListener('pointerdown', go);

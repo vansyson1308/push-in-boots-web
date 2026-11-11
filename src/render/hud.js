@@ -53,7 +53,7 @@ export function drawHud(v, play) {
     v.label(str, hx + 18 * S, cy + 1 * S, 24 * S, col || '#fff8e0', '#3a2414', 'left');
     cy += 34 * S;
   };
-  row('fx/coin', String(play.coinShown | 0));
+  if (sim.stage.arena) row('fx/icon_goblin', String(sim.pushed)); else row('fx/coin', String(play.coinShown | 0));
   if (sim.cageCount) row('fx/' + (play.lastKitten || 'biscuit'), `${sim.kittens.length + play.preKittens}/${sim.cageCount}`, sim.kittens.length + play.preKittens >= sim.cageCount ? '#9dff8a' : null);
   if (sim.sackCount) row('fx/seed_pouch', `${sim.sacks}/${sim.sackCount}`, sim.sacks >= sim.sackCount ? '#9dff8a' : null);
 
@@ -64,6 +64,8 @@ export function drawHud(v, play) {
     const D = sim.director, left = sim.mode === 'daily' ? Math.max(0, DAILY_SECONDS - (D ? D.t : 0)) : (D ? D.t : 0);
     const urgent = sim.mode === 'daily' && left < 10;
     v.label(fmtTime(left + (sim.mode === 'daily' ? 0.99 : 0)), cx, y0 + 64 * S, (urgent ? 30 + Math.sin(sim.time * 10) * 3 : 24) * S, urgent ? '#ff6a5a' : '#ffe9a8', '#3a2414');
+    const rv = play.cfg.rival;               // a friend's score to beat, from a challenge link
+    if (rv) v.label(`${rv.name}: ${fmt(rv.score)}`, x0 + W - 20 * S, y0 + 92 * S, 20 * S, sim.score > rv.score ? '#9dff8a' : '#ffd0c8', '#3a2414', 'right');
   } else {
     const bw = Math.min(300 * S, W * 0.3), bx = cx - bw / 2, byy = y0 + 56 * S, bh = 10 * S;
     pill(ctx, bx - 3 * S, byy - 3 * S, bw + 6 * S, bh + 6 * S, 'rgba(40,24,14,.6)');
@@ -92,7 +94,7 @@ export function drawHud(v, play) {
     ctx.globalAlpha = 1;
   }
   // toasts (kitten safe, checkpoint, pickups)
-  let ty = y0 + v.vh * 0.3;
+  let ty = y0 + Math.max(v.vh * 0.3, (play.callout && play.callout.t > 0 ? 246 : sim.chain.n >= 2 ? 200 : 0) * S);
   for (const to of play.toasts) {
     ctx.globalAlpha = Math.min(1, to.t / 0.3, (to.max - to.t) / 0.15 + 0.2);
     v.label(to.str, cx, ty, 30 * S, to.c || '#fff8e0', '#3a2414');

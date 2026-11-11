@@ -18,6 +18,9 @@ export class Fx {
   }
   ring(x, y, o = {}) { this.p.push({ k: 2, x, y, vx: 0, vy: 0, g: 0, life: 0, max: o.life ?? 0.35, r: o.r ?? 0.3, grow: o.grow ?? 4, c: o.c || '#ffffff', w: o.w ?? 0.12 }); }
   text(str, x, y, o = {}) {
+    // several pop-ups in the same spot fan out upward instead of piling on top of each other
+    let n = 0; for (const q of this.texts) if (!q.screen && q.life < 0.3 && Math.abs(q.x - x) < 2.2 && Math.abs(q.y - y) < 2.5) n++;
+    y += n * 0.48;
     this.texts.push({ str, x, y, vy: o.vy ?? 1.6, life: 0, max: o.life ?? 0.9, size: o.size ?? 0.42, c: o.c || '#fff8e0', stroke: o.stroke || '#3a2414', screen: !!o.screen, pop: o.pop ?? 1, rot: o.rot || 0 });
     if (this.texts.length > 40) this.texts.shift();
   }

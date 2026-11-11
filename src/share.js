@@ -62,7 +62,7 @@ export async function drawCard(cv, d) {
   stats.forEach((s, i) => { const x = 815 + (i - (stats.length - 1) / 2) * 215; ctx.font = F(26); ctx.fillStyle = '#8a5a30'; ctx.fillText(s[0], x, 385); ctx.font = F(48); ctx.fillStyle = '#3a2414'; ctx.fillText(s[1], x, 428); });
   ctx.font = F(34); ctx.fillStyle = '#7a52d6'; ctx.fillText(nameOf(d.name), 815, 500);
   ctx.font = F(46); ctx.lineWidth = 10; ctx.strokeStyle = '#3a2414'; ctx.strokeText(t('card_beat'), 815, 590); ctx.fillStyle = '#fff3d6'; ctx.fillText(t('card_beat'), 815, 590);
-  ctx.font = F(26); ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,243,214,.9)'; ctx.fillText(t('tagline'), 40, 600);
+  ctx.font = F(22); ctx.textAlign = 'left'; ctx.fillStyle = 'rgba(255,243,214,.9)'; ctx.fillText(t('tagline'), 30, 606, 410);
 }
 
 export async function shareCard(cv, text, url) {
