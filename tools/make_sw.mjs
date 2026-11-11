@@ -6,7 +6,7 @@ const shell = ['./', 'index.html', 'css/style.css', 'manifest.webmanifest', 'ass
   ...walk('src').filter((f) => f.endsWith('.js')),
   ...['hero_0', 'gob_0', 'fx_0', 'w1_0', 'boss1_0'].map((n) => `assets/atlas/${n}.webp`),
   ...['sky', 'hills', 'ground'].map((n) => `assets/bg/w1_${n}.webp`),
-  ...walk('assets/ui').filter((f) => !f.endsWith('logo.png')),
+  ...walk('assets/ui'),
   ...walk('assets/font').filter((f) => f.endsWith('.woff2')),
   ...walk('assets/audio').filter((f) => !f.includes('music_')),          // music is fetched when first played
 ].sort((a, b) => (a === './' ? -1 : b === './' ? 1 : a.localeCompare(b)));

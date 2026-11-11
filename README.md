@@ -6,9 +6,10 @@ A water-blasting platformer that runs in any modern browser, on a desktop or a p
 install and no plug-in. A tiny unflappable cat, an absurdly big water blaster, and a farm full of
 goblins to wash off it.
 
-This is the plain-JavaScript edition of the game. It replaces the Unity WebGL build
-(kept under `legacy-unity/` for reference) with about 8 MB of ES modules, sprites and sound
-that start in about a second and work offline.
+This is the plain-JavaScript edition of the game. It replaces the Unity WebGL build with
+about 8 MB of ES modules, sprites and sound that start in about a second and work offline.
+The Unity build is no longer deployed; its last version is in the git history (commit
+`7f99c06`).
 
 ## Play
 
@@ -99,10 +100,15 @@ Handy URL switches for testing: `?play=2-3` starts a stage directly, `?arena=dai
 ## Assets
 
 Art, audio and stage layouts come from the original Push In Boots project. To rebuild
-`assets/` from the Unity build (needs UnityPy, brotli, Pillow and ffmpeg):
+`assets/` from the last Unity build (needs UnityPy, brotli, Pillow and ffmpeg), first check
+its files out of the history:
 
 ```bash
-python3 tools/extract_unity.py legacy-unity/Build /tmp/pib-extract
+git archive 7f99c06 Build | tar -x -C /tmp
+```
+
+```bash
+python3 tools/extract_unity.py /tmp/Build /tmp/pib-extract
 ```
 
 ```bash

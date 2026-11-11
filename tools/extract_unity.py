@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Extracts art, audio and stage data from the Unity web build so that build_assets.py can repack them.
 
-Usage : python3 tools/extract_unity.py legacy-unity/Build <out_dir>
+Usage : python3 tools/extract_unity.py <dir with Web.data.unityweb> <out_dir>
+        (the last Unity build is in git history: git archive 7f99c06 Build | tar -x -C /tmp)
 Needs : pip install UnityPy brotli pillow
 Then  : python3 tools/build_assets.py <out_dir>
 """

@@ -180,7 +180,7 @@ self.addEventListener('activate', (e) => {
 });
 self.addEventListener('fetch', (e) => {
   const req = e.request, url = new URL(req.url);
-  if (req.method !== 'GET' || url.origin !== location.origin || url.pathname.includes('/legacy-unity/')) return;
+  if (req.method !== 'GET' || url.origin !== location.origin) return;
   const page = req.mode === 'navigate';
   e.respondWith(caches.open(CACHE).then(async (cache) => {
     const hit = await cache.match(page ? './' : req, { ignoreSearch: page });
