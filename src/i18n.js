@@ -29,7 +29,7 @@ const EN = {
   // coach
   coach_move_k: 'A / D to move', coach_jump_k: 'SPACE to jump', coach_fire_k: 'Hold J (or click) to spray', coach_duck_k: 'S to duck',
   coach_move_t: 'Drag left side to move', coach_jump_t: 'Tap the arrow to jump', coach_fire_t: 'Hold the splash to spray', coach_duck_t: 'Pull down to duck',
-  coach_push: 'Spray him into the hole!', coach_aim_k: 'Hold W to aim up', coach_aim_t: 'Push up to aim up',
+  coach_push: 'Spray him into the hole!', coach_push_arena: 'Push them off the island!', coach_aim_k: 'Hold W to aim up', coach_aim_t: 'Push up to aim up',
   coach_cage: 'Spray the cage to free the kitten', coach_double: 'Jump again in mid-air', coach_hover_k: 'In the air: hold S + spray to hover',
   coach_hover_t: 'In the air: pull down + spray to hover', coach_special_k: 'Press L for the BIG SPLASH', coach_special_t: 'Tap the wave for the BIG SPLASH',
   coach_shield: 'Shields block water. Get behind him!', coach_bomb: 'Spray the bomb back!', coach_hay: 'Jump the hay — or hose it back!',
@@ -93,7 +93,7 @@ const VI = {
   boss_hint: 'Xịt vào viên ngọc vàng. Ném yêu tinh vào nó cũng đau!', boss_down: 'ĐÃ ĐẨY KHỎI NÔNG TRẠI!',
   coach_move_k: 'A / D để chạy', coach_jump_k: 'SPACE để nhảy', coach_fire_k: 'Giữ J (hoặc chuột) để xịt nước', coach_duck_k: 'S để cúi',
   coach_move_t: 'Kéo bên trái để chạy', coach_jump_t: 'Chạm mũi tên để nhảy', coach_fire_t: 'Giữ nút nước để xịt', coach_duck_t: 'Kéo xuống để cúi',
-  coach_push: 'Xịt cho nó rơi xuống hố!', coach_aim_k: 'Giữ W để ngắm lên', coach_aim_t: 'Đẩy lên để ngắm lên',
+  coach_push: 'Xịt cho nó rơi xuống hố!', coach_push_arena: 'Đẩy chúng rơi khỏi đảo!', coach_aim_k: 'Giữ W để ngắm lên', coach_aim_t: 'Đẩy lên để ngắm lên',
   coach_cage: 'Xịt vào lồng để cứu mèo con', coach_double: 'Nhảy thêm lần nữa trên không', coach_hover_k: 'Trên không: giữ S + xịt để lơ lửng',
   coach_hover_t: 'Trên không: kéo xuống + xịt để lơ lửng', coach_special_k: 'Nhấn L để tung SÓNG THẦN', coach_special_t: 'Chạm nút sóng để tung SÓNG THẦN',
   coach_shield: 'Khiên chặn được nước. Vòng ra sau lưng nó!', coach_bomb: 'Xịt trả quả bom lại!', coach_hay: 'Nhảy qua cuộn rơm — hoặc xịt nó lăn ngược lại!',

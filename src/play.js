@@ -301,7 +301,16 @@ export class Play {
     const sim = this.sim, c = sim.cat, id = sim.stage.id, touch = this.input.device === 'touch', sfxk = touch ? '_t' : '_k';
     if (this.coachT > 0) { this.coachT -= real; if (this.coachT <= 0) this.coach = null; return; }
     this.coach = null;
-    if (sim.mode !== 'story' || sim.outcome) return;
+    if (sim.outcome) return;
+    if (sim.mode !== 'story') {                        // someone's very first run may be a friend's challenge
+      if (this.seen.has('arena') && !this.arenaCoach) return;
+      this.arenaCoach = true; this.seen.add('arena');
+      if (sim.time < 4.5) this.coach = t('coach_move' + sfxk);
+      else if (sim.time < 9 && !this.fired) this.coach = t('coach_fire' + sfxk);
+      else if (sim.time < 13 && !this.jumped) this.coach = t('coach_jump' + sfxk);
+      else if (sim.time < 18 && sim.time > 13) this.coach = t('coach_push_arena');
+      return;
+    }
     if (id === '1-1') {
       const taunter = sim.enemies.find((e) => e.taunt && e.state !== 'gone' && e.state !== 'tumble');
       if (c.x < 5 && sim.time < 12) this.coach = t('coach_move' + sfxk);

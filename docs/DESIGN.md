@@ -60,8 +60,11 @@ blaster, and everything you spray goes *flying*.
   shove each machine back along its arena until it rolls off the far edge.
 - **Transparent judgment** [#20]: three named objectives per stage (finish, every kitten
   home, a score target) plus a rank, and one line saying what the next star needs.
-- **Collusion** [#73]: when you are on your last heart goblins hesitate; after two falls in
-  the same place the gap gets a helper platform.
+- **Collusion** [#73]: a goblin shows off beside most pits; a goblin washed out with a pit just
+  ahead skids and plops into it instead of sailing over; when you are on your last heart goblins
+  hesitate; after two falls in the same place the gap gets a helper plank.
+- **Chance, in rewards only** [#29]: every run stage hides one loot goblin that runs away with a
+  sack of coins, and every washed-out goblin shakes loose a coin or three. Damage is never random.
 - **Three gateways** [#74, #86]: Story (15 stages), Daily Roundup (one seed for the whole
   world, 90 s), Endless Stampede.
 - **Expression** [#85]: water colours and a kitten buddy are visible in play and on every
@@ -69,10 +72,22 @@ blaster, and everything you spray goes *flying*.
 - **The farm shows your progress** [#49, #83]: rescued kittens and recovered grain appear on
   the map screen; nothing in the meta is a chore.
 
-## Tuning table (see `src/sim/tune.js`)
+## Tuning (see `src/sim/tune.js`)
 
 Balance is tuned by doubling and halving [#47]: every number that shapes the push lives in
-one file.
+one file. Third-star score targets are not guessed: `tools/calibrate.mjs` sets each one to 90%
+of the best run by the test bot, so every target has been reached at least once.
+
+## Playtest questions [#91]
+
+The bot proves stages can be finished; it cannot say whether they are fun. With five people
+who have never seen the game, on their own phones, watch for:
+
+1. Do they push a goblin into a pit without being told to?
+2. Do they laugh in the first 20 seconds?
+3. Do they replay a stage unprompted?
+4. Afterwards, can they describe one moment?
+5. Where did they look bored, and what are the three worst parts?
 
 ## Decision log
 

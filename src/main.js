@@ -8,7 +8,7 @@ import { prepareStages, rankFor } from './stages.js';
 import { makeArena } from './sim/arena.js';
 import { Bot } from './sim/bot.js';
 import { save, loadSave, persist, resetSave, stageRec, today, daySeed, totalKittens } from './save.js';
-import { t, setLang, detectLang, KITTEN_NAMES } from './i18n.js';
+import { t, fmt, setLang, detectLang, KITTEN_NAMES } from './i18n.js';
 import { KITTENS } from './sim/sim.js';
 import * as ui from './ui.js';
 import { decodeChallenge, nameOf } from './share.js';
@@ -33,6 +33,11 @@ const app = {
 
   async startStage(id) {
     const st = this.data.stages[id];
+    if (id === '1-1' && !save.data.intro) {            // the story opens the first time the first stage is played
+      save.data.intro = true; persist(); this.stopPlay(); this.screen = 'story'; music('music_farm');
+      ui.showStory(this, [['story_steal', 'story_1'], ['story_trail', 'story_2']], () => this.startStage('1-1'));
+      return;
+    }
     ui.clearUi(); this.screen = 'loading';
     await loadWorld(st.world);
     const rec = stageRec(id);
@@ -77,13 +82,16 @@ const app = {
     this.play.paused = true; pauseBtn.hidden = true; this.input.enabled = false; this.input.releaseAll();
     this.modal = ui.showPause(this);
   },
-  resume() { if (this.play) { this.play.paused = false; pauseBtn.hidden = false; this.input.enabled = true; canvas.focus(); } },
+  resume() { if (this.play) { this.input.releaseAll(); this.play.paused = false; pauseBtn.hidden = false; this.input.enabled = true; canvas.focus(); } },
   stopPlay() { this.play = null; pauseBtn.hidden = true; this.input.enabled = false; this.input.releaseAll(); persistSeen(); },
   quitToMap() { this.stopPlay(); this.toMap(); },
   toMap(focus) {
     if (stageRec('3-5').stars > 0 && !save.data.ending) { this.showEnding(); return; }
     this.stopPlay(); this.screen = 'map'; music('music_farm');
     ui.showMap(this, focus);
+    // fetch the art for wherever the player is heading next, so it is ready (and cached for offline play)
+    const next = this.data.order.find((id) => ui.stageUnlocked(this, id) && !stageRec(id).stars);
+    if (next) loadWorld(this.data.stages[next].world).catch(() => {});
     if (this.challenge) { const c = this.challenge; ui.showChallenge(this, c); }
   },
   afterStage(prev, next) { this.startStage(next); },
@@ -122,7 +130,7 @@ const app = {
     if (res.stageId === '3-5' && !old.clears) news.push({ img: 'icon_ribbon', text: t('all_clear') });
     pauseBtn.hidden = true; this.input.enabled = false; this.screen = 'results';
     const ch = this.challenge && this.challenge.mode === 's' && this.challenge.key === res.stageId ? this.challenge : null;
-    if (ch) { news.unshift({ img: 'icon_ribbon', text: res.score > ch.score ? t('challenge_won', '') : t('challenge_lost', '', ch.score - res.score) }); this.challenge = null; }
+    if (ch) { news.unshift({ img: 'icon_ribbon', text: res.score > ch.score ? t('challenge_won', nameOf(ch.name)) : t('challenge_lost', nameOf(ch.name), fmt(ch.score - res.score)) }); this.challenge = null; }
     this.modal = ui.showResults(this, res, { stars, newBest, coins, news });
     if (homeAfter > homeBefore) sfx('meow');
   },
@@ -206,11 +214,7 @@ function start() {
   const d = save.data, dev = params.get('play'), arena = params.get('arena');
   if (dev && app.data.stages[dev]) { app.startStage(dev); return; }
   if (arena === 'daily' || arena === 'endless') { app.startArena(arena, null, params.get('seed') || undefined); return; }
-  if (!d.intro && !app.challenge) {
-    app.screen = 'story'; music('music_farm');
-    ui.showStory(app, [['story_steal', 'story_1'], ['story_trail', 'story_2']], () => { d.intro = true; persist(); app.startStage('1-1'); });
-    return;
-  }
+  if (!d.intro && !app.challenge) { app.startStage('1-1'); return; }
   app.toMap(d.last || undefined);
 }
 
@@ -229,7 +233,7 @@ addEventListener('pointerdown', audioResume, { passive: true });
 addEventListener('keydown', (e) => { if (['Space', 'ArrowUp', 'ArrowDown'].includes(e.code) && app.screen === 'play') e.preventDefault(); });
 document.addEventListener('gesturestart', (e) => e.preventDefault());
 
-if ('serviceWorker' in navigator && location.protocol === 'https:' && !params.get('nosw')) {
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost') && !params.get('nosw')) {
   addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 void totalKittens;

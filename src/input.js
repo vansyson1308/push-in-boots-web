@@ -1,7 +1,7 @@
 // Keyboard, gamepad and touch, folded into one input frame the simulation understands.
 const KEYS = {
   left: ['KeyA', 'ArrowLeft'], right: ['KeyD', 'ArrowRight'], up: ['KeyW', 'ArrowUp'], down: ['KeyS', 'ArrowDown'],
-  jump: ['Space', 'KeyK', 'KeyZ'], fire: ['KeyJ', 'KeyX', 'ControlLeft'], special: ['KeyL', 'KeyC', 'KeyE', 'ShiftLeft'],
+  jump: ['Space', 'KeyK', 'KeyZ'], fire: ['KeyJ', 'KeyX'], special: ['KeyL', 'KeyC', 'KeyE'],
   pause: ['Escape', 'KeyP'],
 };
 const CODE = {};
@@ -19,8 +19,8 @@ export class Input {
     this.enabled = false;
     addEventListener('keydown', (e) => {
       const a = CODE[e.code];
-      if (!a) return;
-      if (this.enabled) e.preventDefault();
+      if (!a || !this.enabled || e.ctrlKey || e.metaKey || e.altKey) return;   // menus have the keyboard while the game is paused
+      e.preventDefault();
       if (!this.k[a]) { if (a === 'special') this.specialEdge = true; if (a === 'pause') this.pauseEdge = true; this.anyEdge = true; }
       this.k[a] = true; this.device = 'keys';
     });
@@ -32,7 +32,10 @@ export class Input {
     canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up); canvas.addEventListener('lostpointercapture', up);
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   }
-  releaseAll() { this.ptr.clear(); const t = this.touch; t.stick = null; t.dx = t.dy = 0; t.jump = t.fire = t.special = false; }
+  releaseAll() {
+    this.ptr.clear(); const t = this.touch; t.stick = null; t.dx = t.dy = 0; t.jump = t.fire = t.special = false;
+    this.k = {}; this.mouse = false; this.specialEdge = this.pauseEdge = this.anyEdge = false;
+  }
   pos(e) { const r = this.canvas.getBoundingClientRect(), s = this.canvas.width / r.width; return [(e.clientX - r.left) * s, (e.clientY - r.top) * s]; }
   hit(x, y) {
     const L = this.layout; if (!L) return null;
